@@ -1,0 +1,113 @@
+name: CI
+
+# Every change is tested against the oldest VEIM these definitions declare
+# they run in (MIN_APP in veim_definitions/__init__.py) and against VEIM's
+# main branch. A push to main that passes is published as a release, and
+# every VEIM takes it at its next start.
+#
+# Rolling back: push a revert, which publishes a newer release. Deleting a
+# release works too - VEIM treats the latest release as the authority and
+# sets aside anything newer it downloaded - but a revert leaves a record.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        veim: [oldest, main]
+        python-version: ["3.10", "3.12"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: definitions
+
+      - name: Find the VEIM to test against
+        id: veim
+        shell: bash
+        run: |
+          if [ "${{ matrix.veim }}" = oldest ]; then
+            min=$(python3 -c "import re; print(re.search(r'MIN_APP = \"([0-9.]+)\"', open('definitions/veim_definitions/__init__.py').read()).group(1))")
+            echo "ref=v$min" >>"$GITHUB_OUTPUT"
+          else
+            echo "ref=main" >>"$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v7
+        with:
+          repository: Cir0cuit/VEIM
+          ref: ${{ steps.veim.outputs.ref }}
+          path: veim
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install test dependencies
+        run: pip install requests pytest
+
+      - name: Run tests
+        working-directory: definitions
+        env:
+          VEIM_SRC: ${{ github.workspace }}/veim
+        run: pytest -q
+
+  publish:
+    needs: test
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    # One at a time, in push order; a newer push replaces a waiting one.
+    concurrency:
+      group: publish
+      cancel-in-progress: false
+    permissions:
+      contents: write
+    steps:
+      # The token this job holds publishes code every VEIM runs: the action
+      # is pinned to a commit (v7), and the token is not left in .git/config.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Publish the definitions
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tip=$(git ls-remote "https://github.com/$GITHUB_REPOSITORY" refs/heads/main | cut -f1)
+          if [ "$tip" != "$GITHUB_SHA" ]; then
+            echo "main has moved on to $tip; that push publishes"
+            exit 0
+          fi
+
+          previous=$(gh release view --json tagName --jq .tagName 2>/dev/null || true)
+          version=$(date -u +%Y.%m.%d.%H%M%S)
+          python3 tools/build.py "$version" dist --after "$previous"
+          api=$(jq -r .api dist/manifest-v*.json)
+
+          notes="- $(git log -1 --format=%s)"
+          if [ -n "$previous" ]; then
+            if gh release download "$previous" --pattern "manifest-v$api.json" --dir previous 2>/dev/null \
+               && [ "$(jq -r .sha256 "previous/manifest-v$api.json")" = "$(jq -r .sha256 "dist/manifest-v$api.json")" ]; then
+              echo "No definition has changed since $previous; nothing to publish"
+              exit 0
+            fi
+            since=$(gh release view "$previous" --json targetCommitish --jq .targetCommitish)
+            if git cat-file -e "$since^{commit}" 2>/dev/null; then
+              notes=$(git log --format='- %s' "$since..$GITHUB_SHA" -- veim_definitions)
+            fi
+          fi
+
+          gh release create "$version" dist/definitions.zip "dist/manifest-v$api.json" \
+            --target "$GITHUB_SHA" --latest --title "Definitions $version" --notes "${notes:-No notes}"
