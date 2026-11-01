@@ -1,5 +1,5 @@
-from src.core.recipe_base import DistroRecipe, FlavorInfo, DownloadInfo, ScrapeError, version_key
-from src.core.logger import log
+from veim_definitions.common import DistroRecipe, FlavorInfo, DownloadInfo, ScrapeError, version_key
+from veim_definitions.common import log
 
 class ArchRecipe(DistroRecipe):
     key = "arch"

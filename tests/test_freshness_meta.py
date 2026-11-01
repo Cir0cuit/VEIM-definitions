@@ -7,7 +7,7 @@ old release that still answers.
 import importlib
 from pathlib import Path
 
-from src.recipes.registry import CATALOG
+from veim_definitions.registry import CATALOG
 
 
 def _group_modules():

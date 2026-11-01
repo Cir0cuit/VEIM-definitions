@@ -19,9 +19,9 @@ import warnings
 import pytest
 import requests
 
-from src.core.iso_identity import identify
-from src.core.recipe_base import ScrapeError, version_key
-from src.recipes.registry import registry
+from veim_definitions.iso_identity import identify
+from veim_definitions.common import ScrapeError, version_key
+from veim_definitions.registry import registry
 
 pytestmark = pytest.mark.network
 

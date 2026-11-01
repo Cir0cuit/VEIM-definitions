@@ -1,4 +1,4 @@
-"""Freshness Cases for src/recipes/enterprise.py: Rocky, Proxmox, Qubes, FreeBSD,
+"""Freshness Cases for veim_definitions/recipes/enterprise.py: Rocky, Proxmox, Qubes, FreeBSD,
 IPFire, Oracle Linux, Talos, CentOS Stream, XCP-ng and openEuler. See
 tests/freshness.py for what a Case must hold.
 
@@ -14,9 +14,9 @@ import json
 
 import pytest
 
-from src.core.iso_identity import identify
-from src.core.recipe_base import ScrapeError
-from src.recipes.enterprise import (
+from veim_definitions.iso_identity import identify
+from veim_definitions.common import ScrapeError
+from veim_definitions.recipes.enterprise import (
     CentOSStreamRecipe, FreeBSDRecipe, IPFireRecipe, OpenEulerRecipe, OracleLinuxRecipe,
     ProxmoxRecipe, QubesRecipe, RockyLinuxRecipe, TalosRecipe, XCPngRecipe)
 from tests.freshness import Case, Resp, assert_newest, assert_no_fallback, use

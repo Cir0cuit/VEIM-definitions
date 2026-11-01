@@ -5,8 +5,8 @@ is the oldest surviving distribution.
 """
 import re
 
-from src.core.recipe_base import DistroRecipe, FlavorInfo, DownloadInfo, ScrapeError, hrefs, version_key
-from src.core.logger import log
+from veim_definitions.common import DistroRecipe, FlavorInfo, DownloadInfo, ScrapeError, hrefs, version_key
+from veim_definitions.common import log
 
 
 class VoidRecipe(DistroRecipe):

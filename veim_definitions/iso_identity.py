@@ -21,17 +21,9 @@ Not every image is an ISO - netboot.xyz also ships bare .efi files, which
 Ventoy boots too - so each rule spells out its own extension.
 """
 import re
-from dataclasses import dataclass
 from typing import Callable, Dict, List, Optional, Union
 
-from src.core.recipe_base import clean_version
-
-
-@dataclass(frozen=True)
-class IsoIdentity:
-    key: str            # recipe key
-    flavor_id: str
-    version: str        # in the form the recipe's DownloadInfo reports it
+from veim_definitions.common import IsoIdentity, clean_version
 
 
 Flavor = Union[str, Dict[str, str], Callable[[re.Match], str]]

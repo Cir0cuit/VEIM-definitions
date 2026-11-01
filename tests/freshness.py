@@ -33,7 +33,7 @@ from typing import Optional
 
 import requests
 
-from src.core.recipe_base import ScrapeError, _refuse_server_errors
+from veim_definitions.common import ScrapeError, _refuse_server_errors
 
 
 class Resp:

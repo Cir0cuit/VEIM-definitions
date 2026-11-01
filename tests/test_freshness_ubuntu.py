@@ -6,13 +6,13 @@ where a trap needs them (Debian 13.9.0 against 13.10.0, Q4OS 6.9 against
 """
 import pytest
 
-from src.core.iso_identity import identify
-from src.core.recipe_base import ScrapeError
-from src.recipes.debian import LIVE_DIR, NETINST_DIR, TREES, DebianRecipe
-from src.recipes.debian_family import (
+from veim_definitions.iso_identity import identify
+from veim_definitions.common import ScrapeError
+from veim_definitions.recipes.debian import LIVE_DIR, NETINST_DIR, TREES, DebianRecipe
+from veim_definitions.recipes.debian_family import (
     AntiXRecipe, DevuanRecipe, GrmlRecipe, MXLinuxRecipe, Q4OSRecipe)
-from src.recipes.mint import MintRecipe
-from src.recipes.ubuntu import META_RELEASE, UbuntuRecipe
+from veim_definitions.recipes.mint import MintRecipe
+from veim_definitions.recipes.ubuntu import META_RELEASE, UbuntuRecipe
 from tests.freshness import Case, Resp, assert_newest, assert_no_fallback, use
 
 

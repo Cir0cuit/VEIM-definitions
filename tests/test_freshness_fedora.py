@@ -11,12 +11,12 @@ import json
 
 import pytest
 
-from src.core.iso_identity import identify
-from src.core.recipe_base import ScrapeError
-from src.recipes.arch import ArchRecipe
-from src.recipes.fedora import (RELEASES_INDEX, FedoraAtomicRecipe, FedoraLabsRecipe,
+from veim_definitions.iso_identity import identify
+from veim_definitions.common import ScrapeError
+from veim_definitions.recipes.arch import ArchRecipe
+from veim_definitions.recipes.fedora import (RELEASES_INDEX, FedoraAtomicRecipe, FedoraLabsRecipe,
                                 FedoraRecipe, FedoraSpinsRecipe)
-from src.recipes.rolling import EndeavourRecipe, ManjaroRecipe, OmarchyRecipe
+from veim_definitions.recipes.rolling import EndeavourRecipe, ManjaroRecipe, OmarchyRecipe
 from tests.freshness import Case, Resp, assert_newest, assert_no_fallback, use
 
 

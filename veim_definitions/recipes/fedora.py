@@ -11,8 +11,8 @@ All four read the same index, releases.json, which names every image by a
 import re
 from typing import Dict, List, NamedTuple
 
-from src.core.recipe_base import DistroRecipe, FlavorInfo, DownloadInfo, ScrapeError
-from src.core.logger import log
+from veim_definitions.common import DistroRecipe, FlavorInfo, DownloadInfo, ScrapeError
+from veim_definitions.common import log
 
 RELEASES_INDEX = "https://fedoraproject.org/releases.json"
 

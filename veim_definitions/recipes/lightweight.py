@@ -1,9 +1,9 @@
 import re
 from typing import List
-from src.core.recipe_base import (
+from veim_definitions.common import (
     DistroRecipe, FlavorInfo, DownloadInfo, ScrapeError, SOURCEFORGE_PATHS, hrefs,
     published_sha256, sourceforge_rss, version_key)
-from src.core.logger import log
+from veim_definitions.common import log
 
 
 def _links(session, url: str) -> List[str]:

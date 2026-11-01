@@ -1,8 +1,8 @@
 import re
-from src.core.recipe_base import (
+from veim_definitions.common import (
     DistroRecipe, FlavorInfo, DownloadInfo, ScrapeError, SOURCEFORGE_PATHS, published_sha256, sha256_in,
     sourceforge_rss, version_key)
-from src.core.logger import log
+from veim_definitions.common import log
 
 
 # SourceForge answers a browser's user agent with a 403 page, so checksums

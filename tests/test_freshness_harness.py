@@ -9,7 +9,7 @@ import re
 import pytest
 import requests
 
-from src.core.recipe_base import DistroRecipe, DownloadInfo, FlavorInfo, ScrapeError, hrefs, version_key
+from veim_definitions.common import DistroRecipe, DownloadInfo, FlavorInfo, ScrapeError, hrefs, version_key
 from tests.freshness import Case, Resp, StrictSession, assert_newest, assert_no_fallback, permutations, use
 
 

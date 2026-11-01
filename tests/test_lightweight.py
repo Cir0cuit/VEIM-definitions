@@ -8,8 +8,8 @@ offered a downgrade as an update.
 """
 import pytest
 
-from src.core.recipe_base import ScrapeError
-from src.recipes.lightweight import PuppyRecipe, TinyCoreRecipe
+from veim_definitions.common import ScrapeError
+from veim_definitions.recipes.lightweight import PuppyRecipe, TinyCoreRecipe
 from tests.test_stale_recipes import _listing, _with
 
 

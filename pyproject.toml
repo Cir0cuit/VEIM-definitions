@@ -1,0 +1,9 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# Network-dependent tests are opt-in: they hit live distro mirrors and are
+# therefore slow and flaky in CI. Run them with `pytest -m network`.
+addopts = "-m 'not network'"
+markers = [
+    "network: hits live distro mirrors (slow, excluded by default)",
+    "slow: long-running sweep over every recipe and flavor",
+]

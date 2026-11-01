@@ -1,7 +1,7 @@
 import re
-from src.core.recipe_base import (
+from veim_definitions.common import (
     DistroRecipe, FlavorInfo, DownloadInfo, ScrapeError, hrefs, published_sha256, version_key)
-from src.core.logger import log
+from veim_definitions.common import log
 
 
 class ManjaroRecipe(DistroRecipe):

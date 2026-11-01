@@ -5,10 +5,10 @@ what each project publishes. See tests/freshness.py for what a Case must hold.
 """
 import pytest
 
-from src.core.iso_identity import identify
-from src.core.recipe_base import ScrapeError
-from src.recipes.independent import SlackwareRecipe, VoidRecipe
-from src.recipes.lightweight import AlpineRecipe, PuppyRecipe, TinyCoreRecipe
+from veim_definitions.iso_identity import identify
+from veim_definitions.common import ScrapeError
+from veim_definitions.recipes.independent import SlackwareRecipe, VoidRecipe
+from veim_definitions.recipes.lightweight import AlpineRecipe, PuppyRecipe, TinyCoreRecipe
 from tests.freshness import Case, Resp, assert_newest, assert_no_fallback, use
 
 

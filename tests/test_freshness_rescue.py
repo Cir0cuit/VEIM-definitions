@@ -1,4 +1,4 @@
-"""Freshness Cases for src/recipes/rescue.py: Clonezilla, GParted Live,
+"""Freshness Cases for veim_definitions/recipes/rescue.py: Clonezilla, GParted Live,
 Rescuezilla, ShredOS, netboot.xyz, SystemRescue, Memtest86+, Super GRUB2 Disk
 and hrmpf. See tests/freshness.py for what a Case must hold.
 
@@ -18,9 +18,9 @@ import json
 
 import pytest
 
-from src.core.iso_identity import identify
-from src.core.recipe_base import ScrapeError
-from src.recipes.rescue import (
+from veim_definitions.iso_identity import identify
+from veim_definitions.common import ScrapeError
+from veim_definitions.recipes.rescue import (
     ClonezillaRecipe, GPartedRecipe, HrmpfRecipe, MemtestRecipe, NetbootRecipe, RescuezillaRecipe,
     ShredOSRecipe, SuperGrub2Recipe, SystemRescueRecipe)
 from tests.freshness import Case, Resp, assert_newest, assert_no_fallback, use
@@ -248,8 +248,8 @@ def test_iso_identity_reads_the_filename_back(key, case):
 
 
 def test_the_recipes_here_are_the_whole_module():
-    import src.recipes.rescue as module
-    from src.core.recipe_base import DistroRecipe
+    import veim_definitions.recipes.rescue as module
+    from veim_definitions.common import DistroRecipe
     defined = {c.key for c in vars(module).values()
                if isinstance(c, type) and issubclass(c, DistroRecipe) and c is not DistroRecipe}
     assert defined == set(RECIPES) == set(CASES) | set(EXEMPT)

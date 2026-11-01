@@ -7,8 +7,8 @@ import inspect
 
 import pytest
 
-from src.recipes.registry import registry
-from src.core.recipe_base import DistroRecipe, FlavorInfo
+from veim_definitions.registry import registry
+from veim_definitions.common import DistroRecipe, FlavorInfo
 
 
 ALL = registry.get_all_recipes()
@@ -21,7 +21,7 @@ def test_registry_is_not_empty():
 def test_keys_are_unique():
     # Read the keys off CATALOG itself: the registry is a dict by key, so a
     # duplicate would already have replaced the other entry there.
-    from src.recipes.registry import CATALOG
+    from veim_definitions.registry import CATALOG
     keys = [cls.key for cls in CATALOG]
     assert len(keys) == len(set(keys)), "duplicate recipe key would shadow an entry"
 
@@ -57,7 +57,7 @@ def test_no_silent_stale_fallbacks(recipe: DistroRecipe):
     # The recipe's own class and any shared base it resolves through: the four
     # Fedora entries are a table each, over one base that does the fetching.
     source = "\n".join(inspect.getsource(cls) for cls in type(recipe).__mro__
-                       if cls.__module__.startswith("src.recipes"))
+                       if cls.__module__.startswith("veim_definitions.recipes"))
     # And the module's own helpers it calls: Clonezilla and GParted share one
     # that reads a CHECKSUMS.TXT and raises for both.
     module = inspect.getmodule(type(recipe))
@@ -100,7 +100,7 @@ def test_categories_have_no_near_duplicates():
 
 def test_every_category_is_a_filter_chip():
     """The catalog table in registry.py is the single source of truth."""
-    from src.recipes.registry import CATALOG, CATEGORY_ORDER
+    from veim_definitions.registry import CATALOG, CATEGORY_ORDER
     unknown = sorted(set(CATALOG.values()) - set(CATEGORY_ORDER))
     assert not unknown, f"categories missing from CATEGORY_ORDER: {unknown}"
 
@@ -121,7 +121,7 @@ def test_no_category_swallows_the_catalog():
 
 
 def test_categories_are_listed_in_the_declared_order():
-    from src.recipes.registry import CATEGORY_ORDER
+    from veim_definitions.registry import CATEGORY_ORDER
     listed = registry.get_categories()
     assert listed[0] == "All"
     assert listed[1:] == [c for c in CATEGORY_ORDER if c in listed]

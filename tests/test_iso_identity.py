@@ -6,8 +6,8 @@ customised image with the stock one.
 """
 import pytest
 
-from src.core.iso_identity import identify, known_flavors
-from src.recipes.registry import registry
+from veim_definitions.iso_identity import identify, known_flavors
+from veim_definitions.registry import registry
 
 # (filename, key, flavor, version) exactly as the recipes reported them on
 # 2026-09-21. tests/test_recipes_live.py holds the same promise against the

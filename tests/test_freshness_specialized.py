@@ -1,4 +1,4 @@
-"""Freshness Cases for src/recipes/specialized.py: Artix, Sparky, Tails, FydeOS,
+"""Freshness Cases for veim_definitions/recipes/specialized.py: Artix, Sparky, Tails, FydeOS,
 HackerOS and AlmaLinux. See tests/freshness.py for what a Case must hold.
 
 Until 2026-10 four of these took the first link on the page (Sparky, Tails,
@@ -9,9 +9,9 @@ import json
 
 import pytest
 
-from src.core.iso_identity import identify
-from src.core.recipe_base import ScrapeError
-from src.recipes.specialized import (
+from veim_definitions.iso_identity import identify
+from veim_definitions.common import ScrapeError
+from veim_definitions.recipes.specialized import (
     AlmaLinuxRecipe, ArtixRecipe, FydeOSRecipe, HackerOSRecipe, SparkyRecipe, TailsRecipe)
 from tests.freshness import Case, Resp, assert_newest, assert_no_fallback, use
 

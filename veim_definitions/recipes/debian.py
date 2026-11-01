@@ -12,9 +12,9 @@ that is mid-update can carry two.
 import re
 from typing import Optional, Tuple
 
-from src.core.recipe_base import (
+from veim_definitions.common import (
     DistroRecipe, FlavorInfo, DownloadInfo, ScrapeError, hrefs, published_sha256, version_key)
-from src.core.logger import log
+from veim_definitions.common import log
 
 # The same tree, at Debian's two official front doors.
 TREES = (

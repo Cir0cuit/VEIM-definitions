@@ -1,5 +1,12 @@
-from abc import ABC, abstractmethod
-from dataclasses import dataclass
+"""What recipes share: the session they read pages with, and the helpers that
+read a release listing, a table, a checksum list or a release feed.
+
+The contract itself - DistroRecipe, DownloadInfo, FlavorInfo, ScrapeError and
+the version helpers - belongs to VEIM (src/core/recipe_base.py) and is
+re-exported here, so a recipe imports everything it needs from this module.
+Everything else lives here, so that a mirror that starts refusing VEIM's
+User-Agent is fixed with a definitions update rather than a VEIM release.
+"""
 from html.parser import HTMLParser
 from typing import List
 import re
@@ -7,6 +14,9 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
+from src.core import recipe_base
+from src.core.recipe_base import (  # noqa: F401 - re-exported for recipes
+    DownloadInfo, FlavorInfo, IsoIdentity, ScrapeError, clean_version, is_older, version_key)
 from src.core.logger import log
 
 # A server error is a hiccup, not an answer. Two more tries, a second or two
@@ -32,71 +42,6 @@ def _refuse_server_errors(response, *args, **kwargs):
             f"{response.url.split('//', 1)[-1].split('/', 1)[0]} answered "
             f"HTTP {response.status_code}", response=response)
     return response
-
-
-class ScrapeError(Exception):
-    """A recipe could not determine a current, trustworthy download.
-
-    Raised instead of silently returning a stale hardcoded URL. Serving an
-    outdated ISO that looks current is worse than reporting a failure: the user
-    burns a USB stick with an old release and has no way to tell.
-    """
-
-    def __init__(self, distro: str, reason: str):
-        self.distro = distro
-        self.reason = reason
-        super().__init__(f"{distro}: {reason}")
-
-
-@dataclass
-class DownloadInfo:
-    version: str
-    url: str
-    sha256: str = ""
-    filename: str = ""
-    # "zip" when upstream publishes the ISO only inside an archive, which
-    # the downloader unpacks - Ventoy cannot boot a .zip.
-    archive: str = ""
-
-    def __post_init__(self):
-        self.version = clean_version(self.version)
-
-def clean_version(version: str) -> str:
-    """Normalise a scraped version string for display.
-
-    Scrapers pull versions out of filenames and release tags, which arrive with
-    stray prefixes and separators: "v2025.11_31" keeps its tag "v" and then gets
-    another one at render time ("vv2025..."), and truncated captures leave a
-    trailing "-" ("8.1-", "23.0-SP1-").
-    """
-    if not version:
-        return "Unknown"
-    v = str(version).strip()
-    # Strip a leading release-tag "v" ("v2.6.2" -> "2.6.2") but keep words that
-    # merely start with v, like "virt" or "Vera".
-    v = re.sub(r'^v(?=\d)', '', v)
-    # Drop separator debris left by partial regex captures.
-    v = v.strip(" -_.")
-    return v or "Unknown"
-
-
-def version_key(version: str) -> tuple:
-    """Sort key made of the numbers in a version, which ranks 10 above 9 - a
-    string sort gets that backwards."""
-    return tuple(int(n) for n in re.findall(r'\d+', str(version)))
-
-
-def is_older(candidate: str, installed: str) -> bool:
-    """True when `candidate` is recognisably an earlier release than `installed`.
-
-    A check compares what a recipe reports with what is on the drive, and used
-    to call any difference an update. A recipe that falls behind upstream then
-    offers a downgrade as if it were news. Versions are compared by the numbers
-    in them; when that settles nothing ("Tumbleweed", "Stable"), the answer is
-    False and the caller is left with plain inequality.
-    """
-    ours, theirs = version_key(installed), version_key(candidate)
-    return bool(ours) and bool(theirs) and theirs < ours
 
 
 class _Page(HTMLParser):
@@ -188,23 +133,8 @@ def published_sha256(session, url: str, filename: str, who: str, headers: dict =
     return sha256
 
 
-@dataclass
-class FlavorInfo:
-    id: str
-    name: str
-
-class DistroRecipe(ABC):
-    """
-    Abstract base recipe for Linux distributions and bootable utilities.
-
-    A recipe declares its key, name, description and FLAVORS; the registry
-    gives it its category.
-    """
-    key: str
-    name: str
-    description: str
-    FLAVORS: List[FlavorInfo] = []
-    category = ""
+class DistroRecipe(recipe_base.DistroRecipe):
+    """The contract's recipe, with the means to read release pages."""
 
     def get_session(self) -> requests.Session:
         """A session for reading release pages.
@@ -242,15 +172,3 @@ class DistroRecipe(ABC):
             log.warning(f"[{self.name}] GitHub API error: {e}")
             raise ScrapeError(self.name, f"could not read the {self.name} release feed ({e})")
         return str(data.get("tag_name", "")), data.get("assets", [])
-
-    def get_flavors(self) -> List[FlavorInfo]:
-        """Return list of supported flavors/variants for this distro."""
-        return list(self.FLAVORS)
-
-    @abstractmethod
-    def fetch_download_info(self, flavor_id: str) -> DownloadInfo:
-        """Fetch latest version and download URL for the given flavor."""
-        pass
-
-    def __repr__(self):
-        return f"<DistroRecipe {self.name} [{self.key}]>"

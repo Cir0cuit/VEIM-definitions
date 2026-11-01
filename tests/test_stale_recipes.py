@@ -19,12 +19,12 @@ import json
 
 import pytest
 
-from src.core.recipe_base import ScrapeError
-from src.recipes.community_desktop import NixOSRecipe, OpenSUSERecipe, TuxedoRecipe
-from src.recipes.enterprise import RockyLinuxRecipe
-from src.recipes.gaming import BazziteRecipe
-from src.recipes.modern_desktop import PopOSRecipe
-from src.recipes.specialized import AlmaLinuxRecipe, ArtixRecipe
+from veim_definitions.common import ScrapeError
+from veim_definitions.recipes.community_desktop import NixOSRecipe, OpenSUSERecipe, TuxedoRecipe
+from veim_definitions.recipes.enterprise import RockyLinuxRecipe
+from veim_definitions.recipes.gaming import BazziteRecipe
+from veim_definitions.recipes.modern_desktop import PopOSRecipe
+from veim_definitions.recipes.specialized import AlmaLinuxRecipe, ArtixRecipe
 
 
 def _listing(*names):
@@ -303,7 +303,7 @@ def test_tuxedo_takes_the_newest_image_not_the_first(monkeypatch):
 # ------------------------------------------------------------------ Debian
 
 def _debian_pages(cd_status=200, get_status=200):
-    from src.recipes.debian import TREES, NETINST_DIR, LIVE_DIR
+    from veim_definitions.recipes.debian import TREES, NETINST_DIR, LIVE_DIR
     cd, get = TREES
     listing = _listing("debian-13.6.0-amd64-netinst.iso", "debian-13.7.0-amd64-netinst.iso",
                        "debian-13.7.0-amd64-netinst.iso.torrent", "SHA256SUMS")
@@ -322,7 +322,7 @@ def _debian_pages(cd_status=200, get_status=200):
 
 
 def test_debian_takes_the_newest_image_and_its_checksum(monkeypatch):
-    from src.recipes.debian import DebianRecipe, TREES, NETINST_DIR
+    from veim_definitions.recipes.debian import DebianRecipe, TREES, NETINST_DIR
     recipe, session = _with(monkeypatch, DebianRecipe(), _debian_pages())
     info = recipe.fetch_download_info("netinst")
     assert info.version == "13.7.0"
@@ -333,7 +333,7 @@ def test_debian_takes_the_newest_image_and_its_checksum(monkeypatch):
 
 def test_debian_live_matches_the_whole_name(monkeypatch):
     """"kde" must not serve kde-lite, nor "standard" anything else."""
-    from src.recipes.debian import DebianRecipe
+    from veim_definitions.recipes.debian import DebianRecipe
     recipe, _ = _with(monkeypatch, DebianRecipe(), _debian_pages())
     assert recipe.fetch_download_info("kde").filename == "debian-live-13.7.0-amd64-kde.iso"
     with pytest.raises(ScrapeError):
@@ -343,7 +343,7 @@ def test_debian_live_matches_the_whole_name(monkeypatch):
 def test_debian_asks_get_debian_org_when_cdimage_answers_500(monkeypatch):
     """Regression: cdimage.debian.org answers HTTP 500 now and then, and the
     row read "No current release" for a release that was right there."""
-    from src.recipes.debian import DebianRecipe, TREES, NETINST_DIR
+    from veim_definitions.recipes.debian import DebianRecipe, TREES, NETINST_DIR
     recipe, session = _with(monkeypatch, DebianRecipe(), _debian_pages(cd_status=500))
     info = recipe.fetch_download_info("netinst")
     assert info.version == "13.7.0"
@@ -353,7 +353,7 @@ def test_debian_asks_get_debian_org_when_cdimage_answers_500(monkeypatch):
 
 
 def test_debian_names_what_went_wrong_when_both_hosts_fail(monkeypatch):
-    from src.recipes.debian import DebianRecipe
+    from veim_definitions.recipes.debian import DebianRecipe
     recipe, _ = _with(monkeypatch, DebianRecipe(), _debian_pages(cd_status=500, get_status=503))
     with pytest.raises(ScrapeError) as err:
         recipe.fetch_download_info("netinst")

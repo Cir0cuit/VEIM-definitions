@@ -5,11 +5,11 @@ from datetime import date
 
 import pytest
 
-from src.core.iso_identity import identify
-from src.recipes.community_desktop import (
+from veim_definitions.iso_identity import identify
+from veim_definitions.recipes.community_desktop import (
     ElementaryRecipe, MageiaRecipe, NixOSRecipe, OpenSUSERecipe, TuxedoRecipe)
-from src.recipes.modern_desktop import KDENeonRecipe, LinuxLiteRecipe, PopOSRecipe, ZorinRecipe
-from src.core.recipe_base import ScrapeError
+from veim_definitions.recipes.modern_desktop import KDENeonRecipe, LinuxLiteRecipe, PopOSRecipe, ZorinRecipe
+from veim_definitions.common import ScrapeError
 from tests.freshness import Case, Resp, assert_newest, assert_no_fallback, use
 
 

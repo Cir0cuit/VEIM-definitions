@@ -1,9 +1,9 @@
 import re
 from email.utils import parsedate_to_datetime
 from urllib.parse import urljoin
-from src.core.recipe_base import (
+from veim_definitions.common import (
     DistroRecipe, FlavorInfo, DownloadInfo, ScrapeError, published_sha256, version_key)
-from src.core.logger import log
+from veim_definitions.common import log
 
 
 class BazziteRecipe(DistroRecipe):

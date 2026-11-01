@@ -9,8 +9,8 @@ import json
 
 import pytest
 
-from src.core.recipe_base import ScrapeError
-from src.recipes.fedora import RELEASES_INDEX, FedoraRecipe, FedoraSpinsRecipe
+from veim_definitions.common import ScrapeError
+from veim_definitions.recipes.fedora import RELEASES_INDEX, FedoraRecipe, FedoraSpinsRecipe
 from tests.test_stale_recipes import _with
 
 

@@ -6,8 +6,8 @@ reported as the latest release for as long as the page stayed unreadable.
 """
 import pytest
 
-from src.core.recipe_base import ScrapeError
-from src.recipes.community_desktop import ElementaryRecipe
+from veim_definitions.common import ScrapeError
+from veim_definitions.recipes.community_desktop import ElementaryRecipe
 from tests.test_stale_recipes import _with
 
 

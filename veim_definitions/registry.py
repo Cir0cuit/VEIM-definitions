@@ -1,24 +1,24 @@
 from typing import List, Dict, Optional
-from src.core.recipe_base import DistroRecipe
-from src.recipes.fedora import FedoraRecipe, FedoraAtomicRecipe, FedoraSpinsRecipe, FedoraLabsRecipe
-from src.recipes.ubuntu import UbuntuRecipe
-from src.recipes.mint import MintRecipe
-from src.recipes.debian import DebianRecipe
-from src.recipes.arch import ArchRecipe
-from src.recipes.rolling import ManjaroRecipe, EndeavourRecipe, OmarchyRecipe
-from src.recipes.security import KaliRecipe, ParrotRecipe, CaineRecipe
-from src.recipes.modern_desktop import PopOSRecipe, KDENeonRecipe, ZorinRecipe, LinuxLiteRecipe
-from src.recipes.rescue import (
+from veim_definitions.common import DistroRecipe
+from veim_definitions.recipes.fedora import FedoraRecipe, FedoraAtomicRecipe, FedoraSpinsRecipe, FedoraLabsRecipe
+from veim_definitions.recipes.ubuntu import UbuntuRecipe
+from veim_definitions.recipes.mint import MintRecipe
+from veim_definitions.recipes.debian import DebianRecipe
+from veim_definitions.recipes.arch import ArchRecipe
+from veim_definitions.recipes.rolling import ManjaroRecipe, EndeavourRecipe, OmarchyRecipe
+from veim_definitions.recipes.security import KaliRecipe, ParrotRecipe, CaineRecipe
+from veim_definitions.recipes.modern_desktop import PopOSRecipe, KDENeonRecipe, ZorinRecipe, LinuxLiteRecipe
+from veim_definitions.recipes.rescue import (
     ClonezillaRecipe, GPartedRecipe, RescuezillaRecipe, ShredOSRecipe,
     NetbootRecipe, SystemRescueRecipe, MemtestRecipe, SuperGrub2Recipe, HrmpfRecipe)
-from src.recipes.lightweight import PuppyRecipe, TinyCoreRecipe, AlpineRecipe
-from src.recipes.gaming import BazziteRecipe, GarudaRecipe, CachyOSRecipe, NobaraRecipe, PikaOSRecipe
-from src.recipes.community_desktop import OpenSUSERecipe, NixOSRecipe, ElementaryRecipe, TuxedoRecipe, MageiaRecipe
-from src.recipes.specialized import ArtixRecipe, SparkyRecipe, TailsRecipe, FydeOSRecipe, HackerOSRecipe, AlmaLinuxRecipe
-from src.recipes.debian_family import (
+from veim_definitions.recipes.lightweight import PuppyRecipe, TinyCoreRecipe, AlpineRecipe
+from veim_definitions.recipes.gaming import BazziteRecipe, GarudaRecipe, CachyOSRecipe, NobaraRecipe, PikaOSRecipe
+from veim_definitions.recipes.community_desktop import OpenSUSERecipe, NixOSRecipe, ElementaryRecipe, TuxedoRecipe, MageiaRecipe
+from veim_definitions.recipes.specialized import ArtixRecipe, SparkyRecipe, TailsRecipe, FydeOSRecipe, HackerOSRecipe, AlmaLinuxRecipe
+from veim_definitions.recipes.debian_family import (
     MXLinuxRecipe, AntiXRecipe, DevuanRecipe, Q4OSRecipe, GrmlRecipe)
-from src.recipes.independent import VoidRecipe, GentooRecipe, SlackwareRecipe
-from src.recipes.enterprise import (
+from veim_definitions.recipes.independent import VoidRecipe, GentooRecipe, SlackwareRecipe
+from veim_definitions.recipes.enterprise import (
     RockyLinuxRecipe, ProxmoxRecipe, QubesRecipe, FreeBSDRecipe, IPFireRecipe, OracleLinuxRecipe,
     TalosRecipe, CentOSStreamRecipe, XCPngRecipe, OpenEulerRecipe)
 
@@ -34,6 +34,14 @@ CATEGORY_ORDER = [
     "Rescue & Diagnostics",
     "Lightweight",
 ]
+
+# Catalog entries that were split after inventories had been written with the
+# old key: (key, flavor) as recorded -> the key that flavor lives under now.
+MOVED_FLAVORS = {
+    ("fedora", "cinnamon"): "fedora_spins",
+    ("fedora", "xfce"): "fedora_spins",
+    ("fedora", "budgie"): "fedora_spins",
+}
 
 # Every entry in the catalog, and the filter chip it appears under.
 CATALOG = {

@@ -8,10 +8,10 @@ from dataclasses import replace
 
 import pytest
 
-from src.core.iso_identity import identify
-from src.core.recipe_base import ScrapeError
-from src.recipes.gaming import BazziteRecipe, CachyOSRecipe, GarudaRecipe, NobaraRecipe, PikaOSRecipe
-from src.recipes.security import CaineRecipe, KaliRecipe, ParrotRecipe
+from veim_definitions.iso_identity import identify
+from veim_definitions.common import ScrapeError
+from veim_definitions.recipes.gaming import BazziteRecipe, CachyOSRecipe, GarudaRecipe, NobaraRecipe, PikaOSRecipe
+from veim_definitions.recipes.security import CaineRecipe, KaliRecipe, ParrotRecipe
 from tests.freshness import Case, Resp, assert_newest, assert_no_fallback, use
 
 HASH = "0123456789abcdef" * 4

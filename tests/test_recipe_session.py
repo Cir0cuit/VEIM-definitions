@@ -7,8 +7,8 @@ it, and the row read "No current release" - shipped that way in 1.0.6.
 import requests
 import pytest
 
-from src.core import recipe_base
-from src.recipes.debian import DebianRecipe
+from veim_definitions import common as recipe_base
+from veim_definitions.recipes.debian import DebianRecipe
 
 
 def _response(status: int, url: str = "https://cdimage.debian.org/debian-cd/current/"):

@@ -9,14 +9,14 @@ import json
 
 import pytest
 
-from src.core.recipe_base import ScrapeError
-from src.recipes.enterprise import (
+from veim_definitions.common import ScrapeError
+from veim_definitions.recipes.enterprise import (
     CentOSStreamRecipe, FreeBSDRecipe, IPFireRecipe, OpenEulerRecipe, OracleLinuxRecipe,
     ProxmoxRecipe, TalosRecipe, XCPngRecipe)
-from src.recipes.modern_desktop import LinuxLiteRecipe
-from src.recipes.rescue import HrmpfRecipe, NetbootRecipe, SuperGrub2Recipe
-from src.recipes.security import CaineRecipe, KaliRecipe
-from src.recipes.ubuntu import META_RELEASE, UbuntuRecipe
+from veim_definitions.recipes.modern_desktop import LinuxLiteRecipe
+from veim_definitions.recipes.rescue import HrmpfRecipe, NetbootRecipe, SuperGrub2Recipe
+from veim_definitions.recipes.security import CaineRecipe, KaliRecipe
+from veim_definitions.recipes.ubuntu import META_RELEASE, UbuntuRecipe
 from tests.test_stale_recipes import _Resp, _listing, _with
 
 
