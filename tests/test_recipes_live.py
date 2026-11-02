@@ -151,6 +151,11 @@ EOL_PRODUCTS = {
 # against a recipe.
 EOL_GRACE = datetime.timedelta(days=7)
 
+# Proxmox cuts an installer per minor release; the site's "latest" (Backup
+# Server 4.2.8) is a package update that never gets an image.
+ISO_PER_MINOR = {"proxmox-ve", "proxmox-backup-server", "proxmox-mail-gateway",
+                 "proxmox-datacenter-manager"}
+
 
 def _eol_product(key: str, flavor_id: str):
     return EOL_PRODUCTS.get((key, flavor_id), EOL_PRODUCTS.get(key))
@@ -220,6 +225,8 @@ def _stale(recipe, flavor_id, info) -> str:
         return ""
     want, released = current
     have, need = version_key(info.version), version_key(want)
+    if product in ISO_PER_MINOR:
+        need = need[:2]
     if have[:len(need)] >= need:
         return ""
     return (f"{recipe.key}/{flavor_id}: recipe {info.version} < endoflife.date "
