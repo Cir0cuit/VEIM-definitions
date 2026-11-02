@@ -216,10 +216,9 @@ MX_PAGES = {MX: _rss(
 
 # ------------------------------------------------------------------ antiX
 
-ANTIX = "https://antixlinux.com/download/"
-_SF_ANTIX = "https://sourceforge.net/projects/antix-linux/files/Final/"
-ANTIX_PAGES = {ANTIX: "<html><body>" + "".join(
-    f'<a href="{_SF_ANTIX}{folder}/{name}/download">{name}</a>' for folder, name in (
+ANTIX = "https://sourceforge.net/projects/antix-linux/rss?path=/Final"
+_SF_ANTIX = "https://downloads.sourceforge.net/project/antix-linux/Final/"
+ANTIX_PAGES = {ANTIX: _rss(*(f"/Final/{folder}/{name}" for folder, name in (
         ("antiX-23.2", "antiX-23.2_x64-full.iso"),
         ("antiX-26.1", "antiX-26.1_386-full.iso"),
         ("antiX-26.1", "antiX-26.1_x64-full.iso"),
@@ -228,7 +227,9 @@ ANTIX_PAGES = {ANTIX: "<html><body>" + "".join(
         ("antiX-26.1", "antiX-26.1-runit_x64-full.iso"),
         ("antiX-26", "antiX-26_x64-full.iso"),
         ("antiX-8.5", "antiX-8.5_x64-full.iso"),
-    )) + "</body></html>"}
+    )), project="antix-linux"),
+    **{f"{_SF_ANTIX}antiX-26.1/antiX-26.1_x64-{e}.iso.sha256": f"{h * 64}  antiX-26.1_x64-{e}.iso\n"
+       for e, h in (("full", "a"), ("core", "b"))}}
 
 # ----------------------------------------------------------------- Devuan
 

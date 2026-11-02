@@ -87,27 +87,28 @@ class AntiXRecipe(DistroRecipe):
     ]
 
     def fetch_download_info(self, flavor_id: str) -> DownloadInfo:
+        if flavor_id not in ("full", "core"):
+            raise ScrapeError(self.name, f"unknown antiX edition {flavor_id!r}")
         session = self.get_session()
         try:
-            # SourceForge blocks the file browser for this project, so the
-            # project's own download page is the reliable source.
-            resp = session.get("https://antixlinux.com/download/", timeout=20)
-            resp.raise_for_status()
-            # The whole final name: a suffix after the version is a beta
-            # (antiX-27_b1) or another init (antiX-26.1-runit), not this image.
-            matches = re.findall(rf'antiX-(\d+(?:\.\d+)*)_x64-{re.escape(flavor_id)}\.iso', resp.text)
-            if matches:
-                ver = sorted(set(matches), key=version_key)[-1]
-                fname = f"antiX-{ver}_x64-{flavor_id}.iso"
-                link = re.search(rf'(https://[^\s<>"\']*{re.escape(fname)})', resp.text)
-                url = link.group(1) if link else (
-                    f"https://downloads.sourceforge.net/project/antix-linux/"
-                    f"Final/antiX-{ver}/{fname}")
-                return DownloadInfo(version=ver, url=url, filename=fname)
+            # SourceForge hosts the images; antixlinux.com only links there,
+            # and is down for days at a time. Its file browser is blocked for
+            # this project, but the feed of the newest files is not.
+            feed = sourceforge_rss(session, "antix-linux", "path=/Final")
         except Exception as e:
             log.warning(f"[antiX] Scrape error: {e}")
-
-        raise ScrapeError(self.name, f"no current {flavor_id} image listed on antixlinux.com")
+            raise ScrapeError(self.name, f"could not read antiX's SourceForge feed ({e})")
+        # The whole final name: a suffix after the version is a beta
+        # (antiX-27_b1) or another init (antiX-26.1-runit), not this image.
+        matches = re.findall(rf'antiX-(\d+(?:\.\d+)*)_x64-{flavor_id}\.iso', feed)
+        if not matches:
+            raise ScrapeError(self.name, f"no current {flavor_id} image listed on SourceForge")
+        ver = max(set(matches), key=version_key)
+        fname = f"antiX-{ver}_x64-{flavor_id}.iso"
+        url = f"https://downloads.sourceforge.net/project/antix-linux/Final/antiX-{ver}/{fname}"
+        return DownloadInfo(version=ver, url=url, filename=fname,
+                            sha256=published_sha256(session, url + ".sha256", fname, self.name,
+                                                    headers=_CURL))
 
 
 class DevuanRecipe(DistroRecipe):
