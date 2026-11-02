@@ -138,7 +138,8 @@ class CachyOSRecipe(DistroRecipe):
             log.warning(f"[CachyOS] Scrape error: {e}")
             raise ScrapeError(self.name, f"could not read cachyos.org ({e})")
 
-        found = re.findall(rf'(https://[\w.-]+/ISO/{target}/(\d{{6}})/cachyos-{target}-linux-\2\.iso)', r.text)
+        # iso.cachyos.org/<edition>/ since October 2026; mirrors keep /ISO/<edition>/.
+        found = re.findall(rf'(https://[\w.-]+/(?:ISO/)?{target}/(\d{{6}})/cachyos-{target}-linux-\2\.iso)', r.text)
         if not found:
             raise ScrapeError(self.name, f"cachyos.org links no {target} ISO")
         url, version = max(found, key=lambda f: version_key(f[1]))

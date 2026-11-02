@@ -144,7 +144,7 @@ def _pika(*names):
 # ----------------------------------------------------------------- CachyOS
 
 CACHY = CachyOSRecipe.PAGE
-CACHY_CDN = "https://cdn77.cachyos.org/ISO/"
+CACHY_CDN = "https://iso.cachyos.org/"
 _CACHY_LINKS = (
     CACHY_CDN + "desktop/260426/cachyos-desktop-linux-260426.iso",
     CACHY_CDN + "handheld/260628/cachyos-handheld-linux-260628.iso",
