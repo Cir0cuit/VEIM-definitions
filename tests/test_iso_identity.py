@@ -67,6 +67,7 @@ OFFICIAL = [
     ("Zorin-OS-18-Core-64-bit-r3.iso", "zorin", "core", "18.0 r3"),
     ("Zorin-OS-17.3-Education-64-bit-r2.iso", "zorin", "education", "17.3 r2"),
     ("neon-user-desktop-20260903-0454.iso", "kde_neon", "user", "20260903-0454"),
+    ("neon-user-desk-20261025-1825.iso", "kde_neon", "user", "20261025-1825"),
     ("openSUSE-Leap-15.6-DVD-x86_64-Current.iso", "opensuse", "leap-dvd", "15.6"),
     ("Leap-16.0-offline-installer-x86_64-Build178.27.install.iso", "opensuse", "leap-dvd",
      "16.0 (Build 178.27)"),

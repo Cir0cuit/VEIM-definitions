@@ -124,7 +124,7 @@ _RULES: List[_Rule] = [
           _same("core", "education"), version="{v}.0 r{r}"),
     _Rule("zorin", rf"Zorin-OS-{V}-(?P<f>Core|Education)-64-bit\.iso",
           _same("core", "education")),
-    _Rule("kde_neon", r"neon-user-desktop-(?P<v>\d{8}-\d{4})\.iso", "user"),
+    _Rule("kde_neon", r"neon-user-desk(?:top)?-(?P<v>\d{8}-\d{4})\.iso", "user"),
     _Rule("opensuse", r"Leap-(?P<v>\d+\.\d+)-(?P<f>offline|online)-installer-x86_64"
                       r"-Build(?P<b>[\d.]+)\.install\.iso",
           {"offline": "leap-dvd", "online": "leap-net"}, version="{v} (Build {b})"),

@@ -84,14 +84,15 @@ class KDENeonRecipe(DistroRecipe):
         # ("-current.iso") says nothing a later check could compare.
         found = {}
         for href in hrefs(r.text):
-            m = re.fullmatch(r'neon-user-desktop-(\d{8}-\d{4})\.iso', href.split("/")[-1])
+            # "desk" since October 2026, "desktop" before.
+            m = re.fullmatch(r'neon-user-desk(?:top)?-(\d{8}-\d{4})\.iso', href.split("/")[-1])
             if m:
                 found.setdefault(m.group(1), href)
         if not found:
             raise ScrapeError(self.name, "neon.kde.org listed no dated user-edition ISO")
         ver = max(found)
         url, fname = found[ver], found[ver].split("/")[-1]
-        # Beside each image: neon-user-desktop-<ver>.sha256sum, no ".iso".
+        # Beside each image: neon-user-desk-<ver>.sha256sum, no ".iso".
         sha256 = published_sha256(session, url[:-len(".iso")] + ".sha256sum", fname, self.name)
         return DownloadInfo(version=ver, url=url, filename=fname, sha256=sha256)
 

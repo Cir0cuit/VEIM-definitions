@@ -167,19 +167,19 @@ POP_PAGES = {
 NEON = "https://neon.kde.org/download"
 NEON_FILES = "https://files.kde.org/neon/images/"
 NEON_PAGE = _links(
-    f"{NEON_FILES}desktop/user/20260601-1200/neon-user-desktop-20260601-1200.iso",
-    f"{NEON_FILES}desktop/user/20260903-0454/neon-user-desktop-20260903-0454.iso",
-    f"{NEON_FILES}desktop/user/20260903-0454/neon-user-desktop-20260903-0454.iso.sig",
-    f"{NEON_FILES}desktop/user/current/neon-user-desktop-current.iso",
-    f"{NEON_FILES}desktop/testing/20260905-0146/neon-testing-desktop-20260905-0146.iso",
+    f"{NEON_FILES}desk/user/20260601-1200/neon-user-desk-20260601-1200.iso",
+    f"{NEON_FILES}desk/user/20260903-0454/neon-user-desk-20260903-0454.iso",
+    f"{NEON_FILES}desk/user/20260903-0454/neon-user-desk-20260903-0454.iso.sig",
+    f"{NEON_FILES}desk/user/current/neon-user-desk-current.iso",
+    f"{NEON_FILES}desk/testing/20260905-0146/neon-testing-desk-20260905-0146.iso",
     f"{NEON_FILES}mobile/user/20260910-0514/neon-user-mobile-20260910-0514.iso",
     f"{NEON_FILES}desktop/user/20251212-0300/neon-user-desktop-20251212-0300.iso",
 )
 
 
 def _neon_sum(ver):
-    name = f"neon-user-desktop-{ver}"
-    return {f"{NEON_FILES}desktop/user/{ver}/{name}.sha256sum": f"{SUM}  {name}.iso\n"}
+    name = f"neon-user-desk-{ver}"
+    return {f"{NEON_FILES}desk/user/{ver}/{name}.sha256sum": f"{SUM}  {name}.iso\n"}
 
 # ----------------------------------------------------------------- Zorin OS
 
@@ -255,7 +255,7 @@ CASES = {
              newest_urls=(POP, POP_API.format("24.04", "nvidia"))),
     ],
     "kde_neon": Case(pages={NEON: NEON_PAGE, **_neon_sum("20260903-0454")}, flavor="user",
-                     newest="20260903-0454", filename="neon-user-desktop-20260903-0454.iso", newest_urls=(NEON,),
+                     newest="20260903-0454", filename="neon-user-desk-20260903-0454.iso", newest_urls=(NEON,),
                      extra={"sha256": SUM}),
     "zorin": [
         Case(pages=ZORIN_PAGES, flavor="core", newest="18.1 r2", filename="Zorin-OS-18.1-Core-64-bit-r2.iso",
@@ -336,7 +336,7 @@ NEWER = {
     "popos": (CASES["popos"][0], {POP: POP_PAGES[POP] + "\nfetchRelease('26.04', 'generic', 'amd64')"},
               "26.04 (Build 3)"),
     "kde_neon": (CASES["kde_neon"], {NEON: NEON_PAGE + _links(
-        f"{NEON_FILES}desktop/user/20261001-0101/neon-user-desktop-20261001-0101.iso"),
+        f"{NEON_FILES}desk/user/20261001-0101/neon-user-desk-20261001-0101.iso"),
         **_neon_sum("20261001-0101")}, "20261001-0101"),
     "zorin": (CASES["zorin"][0], {ZORIN + "18/core/": ZORIN_PAGES[ZORIN + "18/core/"]
                                   + _zorin("Core", "18.2-{e}-64-bit")}, "18.2"),
@@ -362,7 +362,7 @@ def test_mageia_refuses_a_release_directory_that_has_no_images_yet(monkeypatch):
 
 
 def test_kde_neon_never_reports_a_label(monkeypatch):
-    page = _links(f"{NEON_FILES}desktop/user/current/neon-user-desktop-current.iso")
+    page = _links(f"{NEON_FILES}desk/user/current/neon-user-desk-current.iso")
     recipe, _ = use(monkeypatch, KDENeonRecipe(), {NEON: page})
     with pytest.raises(ScrapeError, match="no dated user-edition ISO"):
         recipe.fetch_download_info("user")
