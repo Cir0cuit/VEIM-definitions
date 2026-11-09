@@ -6,15 +6,22 @@ either: fedoraproject.org sorts them into Editions, Atomic Desktops, Spins and
 Labs, and that is the split used here.
 
 All four read the same index, releases.json, which names every image by a
-`variant` and `subvariant` and carries its SHA-256.
+`variant` and `subvariant` and carries its SHA-256. IoT is the exception: it
+is released on its own, and the index went on listing only "45 Beta" for days
+after IoT 45 was out, so it is read from the IoT tree on the mirror instead.
 """
 import re
 from typing import Dict, List, NamedTuple
 
 from veim_definitions.common import DistroRecipe, FlavorInfo, DownloadInfo, ScrapeError
-from veim_definitions.common import log
+from veim_definitions.common import hrefs, log, published_sha256
 
 RELEASES_INDEX = "https://fedoraproject.org/releases.json"
+# One folder per final release; pre-releases are in test/, branched/ and rawhide/.
+IOT_TREE = "https://dl.fedoraproject.org/pub/alt/iot/"
+IOT_DOWNLOAD = "https://download.fedoraproject.org/pub/alt/iot/"
+# dl.fedoraproject.org answers a browser User-Agent with a bot check (Anubis).
+IOT_HEADERS = {"User-Agent": "curl/8.4.0"}
 
 
 class _Image(NamedTuple):
@@ -73,15 +80,8 @@ class _FedoraFamily(DistroRecipe):
         # good leaves the index when its last release reaches end of life.
         version, entry = max(candidates, key=lambda c: c[0])
         url = entry["link"]
-        filename = url.split("/")[-1]
-
-        # IoT is rebuilt between releases and says so in its name
-        # ("Fedora-IoT-ostree-44-20260427.0"). The release number alone would
-        # call every one of those rebuilds the same version.
-        rebuilt = re.search(rf'-{version}-(\d{{8}}\.\d+)\.', filename)
-        shown = f"{version} ({rebuilt.group(1)})" if rebuilt else str(version)
-
-        return DownloadInfo(version=shown, url=url, sha256=entry.get("sha256", ""), filename=filename)
+        return DownloadInfo(version=str(version), url=url, sha256=entry.get("sha256", ""),
+                            filename=url.split("/")[-1])
 
 
 class FedoraRecipe(_FedoraFamily):
@@ -97,6 +97,42 @@ class FedoraRecipe(_FedoraFamily):
         "iot": _Image("IoT", "IoT"),
         "everything": _Image("Everything", "Everything (Net Install)"),
     }
+
+    def fetch_download_info(self, flavor_id: str) -> DownloadInfo:
+        if flavor_id.lower() == "iot":
+            return self._iot()
+        return super().fetch_download_info(flavor_id)
+
+    def _iot(self) -> DownloadInfo:
+        session = self.get_session()
+        try:
+            r = session.get(IOT_TREE, timeout=15, headers=IOT_HEADERS)
+            r.raise_for_status()
+            releases = [int(h[:-1]) for h in hrefs(r.text) if re.fullmatch(r"\d+/", h)]
+            if not releases:
+                raise ScrapeError(self.name, "Fedora's IoT tree lists no release")
+            version = max(releases)
+            folder = f"{version}/IoT/x86_64/iso/"
+            r = session.get(IOT_TREE + folder, timeout=15, headers=IOT_HEADERS)
+            r.raise_for_status()
+        except ScrapeError:
+            raise
+        except Exception as e:
+            log.warning(f"[{self.name}] Failed reading the IoT tree: {e}")
+            raise ScrapeError(self.name, f"could not read Fedora's IoT tree ({e})")
+
+        # IoT is rebuilt within a release and says so in its name
+        # ("Fedora-IoT-ostree-45-20261031.0"); the newest compose is current.
+        pattern = re.compile(rf"Fedora-IoT-ostree-{version}-(\d{{8}})\.(\d+)\.x86_64\.iso")
+        builds = [m for m in (pattern.fullmatch(h.rsplit("/", 1)[-1]) for h in hrefs(r.text)) if m]
+        if not builds:
+            raise ScrapeError(self.name, f"Fedora IoT {version} has no x86_64 installer image")
+        build = max(builds, key=lambda m: (int(m.group(1)), int(m.group(2))))
+        filename, compose = build.group(0), f"{build.group(1)}.{build.group(2)}"
+        sha256 = published_sha256(session, f"{IOT_TREE}{folder}Fedora-IoT-{version}-x86_64-{compose}-CHECKSUM",
+                                  filename, self.name, headers=IOT_HEADERS)
+        return DownloadInfo(version=f"{version} ({compose})", url=IOT_DOWNLOAD + folder + filename,
+                            sha256=sha256, filename=filename)
 
 
 class FedoraAtomicRecipe(_FedoraFamily):

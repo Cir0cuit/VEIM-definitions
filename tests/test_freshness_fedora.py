@@ -14,8 +14,8 @@ import pytest
 from veim_definitions.iso_identity import identify
 from veim_definitions.common import ScrapeError
 from veim_definitions.recipes.arch import ArchRecipe
-from veim_definitions.recipes.fedora import (RELEASES_INDEX, FedoraAtomicRecipe, FedoraLabsRecipe,
-                                FedoraRecipe, FedoraSpinsRecipe)
+from veim_definitions.recipes.fedora import (IOT_TREE, RELEASES_INDEX, FedoraAtomicRecipe,
+                                FedoraLabsRecipe, FedoraRecipe, FedoraSpinsRecipe)
 from veim_definitions.recipes.rolling import EndeavourRecipe, ManjaroRecipe, OmarchyRecipe
 from tests.freshness import Case, Resp, assert_newest, assert_no_fallback, use
 
@@ -42,11 +42,8 @@ def _fedora_images(version, tag):
 
 FEDORA_ENTRIES = (
     _fedora_images("43", "43-1.6")
-    + [_fe("43", "IoT", "Fedora-IoT-ostree-43-20251021.0.x86_64.iso")]
     + _fedora_images("44", "44-1.7")
-    + [_fe("44", "IoT", "Fedora-IoT-ostree-44-20260427.0.x86_64.iso"),
-       _fe("44", "IoT_Simplified_Provisioner", "Fedora-IoT-provisioner-44-20260427.0.x86_64.iso"),
-       _fe("44", "Server", "Fedora-Server-dvd-aarch64-44-1.7.iso", arch="aarch64")]
+    + [_fe("44", "Server", "Fedora-Server-dvd-aarch64-44-1.7.iso", arch="aarch64")]
     # A release text order puts above 44.
     + _fedora_images("9", "9-1.1")
     # Pre-releases above it: the index lists the branched Beta and Rawhide.
@@ -66,6 +63,7 @@ FEDORA_INDEX = json.dumps(FEDORA_ENTRIES)
 def _fedora_case(flavor, newest, filename):
     return Case(pages={RELEASES_INDEX: FEDORA_INDEX}, flavor=flavor, newest=newest,
                 filename=filename, newest_urls=(RELEASES_INDEX,))
+
 
 
 # ------------------------------------------------------------------ Arch
@@ -154,6 +152,38 @@ EOS_NAMES = (
 )
 
 
+# ------------------------------------------------------------------ Fedora IoT
+
+# IoT, from its tree on the mirror. Pre-releases are kept in test/, branched/
+# and rawhide/; 46_Beta/ stands for one numbered above the newest release.
+# 9/ against 45/ is the text-order trap, and a release is rebuilt within its
+# folder: compose 20261031.10 against 20261031.9 is the same trap again.
+IOT_45 = IOT_TREE + "45/IoT/x86_64/iso/"
+IOT_44 = IOT_TREE + "44/IoT/x86_64/iso/"
+
+
+def _iot_folder(version, *composes):
+    names = []
+    for c in composes:
+        names += [f"Fedora-IoT-{version}-x86_64-{c}-CHECKSUM", f"Fedora-IoT-ostree-{version}-{c}.x86_64.iso",
+                  f"Fedora-IoT-provisioner-{version}-{c}.x86_64.iso"]
+    return _autoindex(*names)
+
+
+def _iot_sums(version, compose, sha):
+    name = f"Fedora-IoT-ostree-{version}-{compose}.x86_64.iso"
+    return f"-----BEGIN PGP SIGNED MESSAGE-----\n\n# {name}: 1 bytes\nSHA256 ({name}) = {sha}\n"
+
+
+IOT_PAGES = {
+    IOT_TREE: _autoindex("43/", "45/", "44/", "46_Beta/", "9/", "branched/", "rawhide/", "test/"),
+    IOT_45: _iot_folder("45", "20261009.0", "20261031.10", "20261031.9"),
+    IOT_45 + "Fedora-IoT-45-x86_64-20261031.10-CHECKSUM": _iot_sums("45", "20261031.10", "f" * 64),
+    IOT_44: _iot_folder("44", "20260427.0"),
+    IOT_44 + "Fedora-IoT-44-x86_64-20260427.0-CHECKSUM": _iot_sums("44", "20260427.0", "4" * 64),
+}
+
+
 # ------------------------------------------------------------------ Omarchy
 
 OMARCHY = "https://omarchy.org/"
@@ -170,7 +200,8 @@ OMARCHY_PAGE = "<html><body>" + "".join(
 CASES = {
     "fedora": [
         _fedora_case("server-netinst", "44", "Fedora-Server-netinst-x86_64-44-1.7.iso"),
-        _fedora_case("iot", "44 (20260427.0)", "Fedora-IoT-ostree-44-20260427.0.x86_64.iso"),
+        Case(pages=IOT_PAGES, flavor="iot", newest="45 (20261031.10)",
+             filename="Fedora-IoT-ostree-45-20261031.10.x86_64.iso", newest_urls=(IOT_TREE, IOT_45)),
     ],
     "fedora_atomic": [
         _fedora_case("silverblue", "44", "Fedora-Silverblue-ostree-x86_64-44-1.7.iso"),
@@ -226,7 +257,7 @@ def _fetch(monkeypatch, cls, pages, flavor):
 
 # ------------------------------------------------------------------ Fedora
 
-FEDORA_45 = {"server-netinst": (FedoraRecipe, "45"), "iot": (FedoraRecipe, "45 (20261021.0)"),
+FEDORA_45 = {"server-netinst": (FedoraRecipe, "45"),
              "silverblue": (FedoraAtomicRecipe, "45"), "mate": (FedoraSpinsRecipe, "45"),
              "python-classroom": (FedoraLabsRecipe, "45")}
 
@@ -234,9 +265,26 @@ FEDORA_45 = {"server-netinst": (FedoraRecipe, "45"), "iot": (FedoraRecipe, "45 (
 @pytest.mark.parametrize("flavor", FEDORA_45)
 def test_fedora_newer_release_appears(monkeypatch, flavor):
     cls, newest = FEDORA_45[flavor]
-    index = FEDORA_ENTRIES + _fedora_images("45", "45-1.5") + [
-        _fe("45", "IoT", "Fedora-IoT-ostree-45-20261021.0.x86_64.iso")]
+    index = FEDORA_ENTRIES + _fedora_images("45", "45-1.5")
     assert _fetch(monkeypatch, cls, {RELEASES_INDEX: json.dumps(index)}, flavor).version == newest
+
+
+def test_fedora_iot_newer_release_appears(monkeypatch):
+    iot_46 = IOT_TREE + "46/IoT/x86_64/iso/"
+    pages = {**IOT_PAGES, IOT_TREE: _autoindex("43/", "46/", "45/", "44/", "9/", "test/"),
+             iot_46: _iot_folder("46", "20270420.0"),
+             iot_46 + "Fedora-IoT-46-x86_64-20270420.0-CHECKSUM": _iot_sums("46", "20270420.0", "6" * 64)}
+    info = _fetch(monkeypatch, FedoraRecipe, pages, "iot")
+    assert (info.version, info.sha256) == ("46 (20270420.0)", "6" * 64)
+    assert info.url == "https://download.fedoraproject.org/pub/alt/iot/46/IoT/x86_64/iso/" + info.filename
+
+
+def test_fedora_iot_newest_folder_without_an_image_is_refused(monkeypatch):
+    """Not answered with 45: the newest release's image is missing, not older."""
+    iot_46 = IOT_TREE + "46/IoT/x86_64/iso/"
+    pages = {**IOT_PAGES, IOT_TREE: _autoindex("45/", "46/"), iot_46: _autoindex()}
+    with pytest.raises(ScrapeError):
+        _fetch(monkeypatch, FedoraRecipe, pages, "iot")
 
 
 def test_fedora_beta_alone_above_is_not_a_release(monkeypatch):
