@@ -52,6 +52,13 @@ FEDORA_ENTRIES = (
     # Pre-releases above it: the index lists the branched Beta and Rawhide.
     + _fedora_images("45 Beta", "45_Beta-1.3")
     + _fedora_images("Rawhide", "Rawhide-20261006.n.0")
+    # Sway Atomic was Sericea until 44; the index keeps both names.
+    + [_fe("9", "Sericea", "Fedora-Sericea-ostree-x86_64-9-1.1.iso"),
+       _fe("43", "Sericea", "Fedora-Sericea-ostree-x86_64-43-1.6.iso"),
+       _fe("44", "Sericea", "Fedora-Sericea-ostree-x86_64-44-1.7.iso"),
+       _fe("45", "Sway-Atomic", "Fedora-SwayAtomic-Installer-45-1.4.x86_64.iso"),
+       _fe("46 Beta", "Sway-Atomic", "Fedora-SwayAtomic-Installer-46_Beta-1.2.x86_64.iso"),
+       _fe("Rawhide", "Sway-Atomic", "Fedora-SwayAtomic-Installer-Rawhide-20261101.n.0.x86_64.iso")]
 )
 FEDORA_INDEX = json.dumps(FEDORA_ENTRIES)
 
@@ -165,7 +172,10 @@ CASES = {
         _fedora_case("server-netinst", "44", "Fedora-Server-netinst-x86_64-44-1.7.iso"),
         _fedora_case("iot", "44 (20260427.0)", "Fedora-IoT-ostree-44-20260427.0.x86_64.iso"),
     ],
-    "fedora_atomic": _fedora_case("silverblue", "44", "Fedora-Silverblue-ostree-x86_64-44-1.7.iso"),
+    "fedora_atomic": [
+        _fedora_case("silverblue", "44", "Fedora-Silverblue-ostree-x86_64-44-1.7.iso"),
+        _fedora_case("sway-atomic", "45", "Fedora-SwayAtomic-Installer-45-1.4.x86_64.iso"),
+    ],
     "fedora_spins": _fedora_case("mate", "44", "Fedora-MATE_Compiz-Live-44-1.7.x86_64.iso"),
     "fedora_labs": _fedora_case("python-classroom", "44", "Fedora-Python-Classroom-Live-44-1.7.x86_64.iso"),
     "arch": Case(pages={ARCH_INDEX: _arch_index(*ARCH_RELEASES)}, flavor="standard",

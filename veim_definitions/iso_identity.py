@@ -78,9 +78,10 @@ _RULES: List[_Rule] = [
           {"silverblue": "silverblue", "kinoite": "kinoite", "sericea": "sway-atomic",
            "onyx": "budgie-atomic", "cosmic-atomic": "cosmic-atomic"}),
     # From 45 (seen in its Beta): "Fedora-Silverblue-Installer-45-1.3.x86_64.iso".
-    _Rule("fedora_atomic", r"Fedora-(?P<f>Silverblue|Kinoite|CosmicAtomic)-Installer"
+    _Rule("fedora_atomic", r"Fedora-(?P<f>Silverblue|Kinoite|SwayAtomic|BudgieAtomic|CosmicAtomic)-Installer"
                            r"-(?P<v>\d+)-[\d.]+\.x86_64\.iso",
-          {"silverblue": "silverblue", "kinoite": "kinoite", "cosmicatomic": "cosmic-atomic"}),
+          {"silverblue": "silverblue", "kinoite": "kinoite", "swayatomic": "sway-atomic",
+           "budgieatomic": "budgie-atomic", "cosmicatomic": "cosmic-atomic"}),
     _Rule("fedora_spins", r"Fedora-(?P<f>Xfce|Cinnamon|Budgie|COSMIC|MATE_Compiz|LXQt|LXDE|i3|Sway"
                           r"|MiracleWM|KDE-Mobile|SoaS)-Live-(?P<v>\d+)-[\d.]+\.x86_64\.iso",
           {"xfce": "xfce", "cinnamon": "cinnamon", "budgie": "budgie", "cosmic": "cosmic",

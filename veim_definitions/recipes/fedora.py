@@ -23,6 +23,8 @@ class _Image(NamedTuple):
     # Part of the filename, where one subvariant publishes several images
     # (Server ships a DVD and a network installer).
     filename_part: str = ""
+    # The subvariant's earlier names: older releases stay in the index under them.
+    formerly: tuple = ()
 
 
 class _FedoraFamily(DistroRecipe):
@@ -38,6 +40,7 @@ class _FedoraFamily(DistroRecipe):
         if image is None:
             raise ScrapeError(self.name, f"unknown image {flavor_id!r}")
 
+        names = {n.lower() for n in (image.subvariant, *image.formerly)}
         session = self.get_session()
         try:
             r = session.get(RELEASES_INDEX, timeout=15)
@@ -54,7 +57,7 @@ class _FedoraFamily(DistroRecipe):
             if entry.get("arch") != "x86_64" or not link.endswith(".iso") or not raw_version.isdigit():
                 # Rawhide and branched pre-releases ("45 Beta") are not releases.
                 continue
-            if str(entry.get("subvariant", "")).lower() != image.subvariant.lower():
+            if str(entry.get("subvariant", "")).lower() not in names:
                 continue
             if image.filename_part and image.filename_part not in link.rsplit("/", 1)[-1]:
                 continue
@@ -107,8 +110,9 @@ class FedoraAtomicRecipe(_FedoraFamily):
     IMAGES = {
         "silverblue": _Image("Silverblue", "Silverblue (GNOME)"),
         "kinoite": _Image("Kinoite", "Kinoite (KDE Plasma)"),
-        "sway-atomic": _Image("Sericea", "Sway Atomic"),
-        "budgie-atomic": _Image("Onyx", "Budgie Atomic"),
+        # Sericea and Onyx until 44.
+        "sway-atomic": _Image("Sway-Atomic", "Sway Atomic", formerly=("Sericea",)),
+        "budgie-atomic": _Image("Budgie-Atomic", "Budgie Atomic", formerly=("Onyx",)),
         "cosmic-atomic": _Image("COSMIC-Atomic", "COSMIC Atomic"),
     }
 
