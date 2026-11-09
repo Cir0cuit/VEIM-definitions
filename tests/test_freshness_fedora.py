@@ -150,12 +150,14 @@ EOS_NAMES = (
 # ------------------------------------------------------------------ Omarchy
 
 OMARCHY = "https://omarchy.org/"
-OMARCHY_SUM = "https://iso.omarchy.org/omarchy-4.0.10.iso.sha256"
+OMARCHY_SUM = "https://iso.omarchy.org/omarchy-4.0.10-x86.iso.sha256"
 OMARCHY_PAGE = "<html><body>" + "".join(
     f'<a href="https://iso.omarchy.org/{n}">{n}</a>'
-    # 4.0.10 against 4.0.9 is the text-order trap; the rc is not a release.
-    for n in ("omarchy-4.0.9.iso", "omarchy-4.0.10.iso", "omarchy-4.0.10.iso.sha256",
-              "omarchy-4.1.0-rc1.iso", "omarchy-3.2.0.iso")) + "</body></html>"
+    # 4.0.10 against 4.0.9 is the text-order trap; the rc is not a release and
+    # the aarch64 build is not offered. 4.0.9 keeps the name used before 4.5.
+    for n in ("omarchy-4.0.9.iso", "omarchy-4.0.10-x86.iso", "omarchy-4.0.10-x86.iso.sha256",
+              "omarchy-4.0.11-aarch64.iso", "omarchy-4.1.0-rc1-x86.iso",
+              "omarchy-3.2.0-x86.iso")) + "</body></html>"
 
 
 CASES = {
@@ -174,8 +176,8 @@ CASES = {
                     newest_urls=(SF, SF + "26.1.10/")),
     "endeavour": Case(pages={EOS: _autoindex(*EOS_NAMES)}, flavor="standard", newest="2026.08.15",
                       filename="EndeavourOS_Titan-Nova-2026.08.15.iso", newest_urls=(EOS,)),
-    "omarchy": Case(pages={OMARCHY: OMARCHY_PAGE, OMARCHY_SUM: "d" * 64 + "  omarchy-4.0.10.iso\n"},
-                    flavor="standard", newest="4.0.10", filename="omarchy-4.0.10.iso",
+    "omarchy": Case(pages={OMARCHY: OMARCHY_PAGE, OMARCHY_SUM: "d" * 64 + "  omarchy-4.0.10-x86.iso\n"},
+                    flavor="standard", newest="4.0.10", filename="omarchy-4.0.10-x86.iso",
                     newest_urls=(OMARCHY,)),
 }
 EXEMPT = {}
@@ -319,8 +321,8 @@ def test_endeavour_refuses_a_newest_image_it_cannot_version(monkeypatch, name):
 # ------------------------------------------------------------------ Omarchy
 
 def test_omarchy_newer_release_appears(monkeypatch):
-    sum_url = "https://iso.omarchy.org/omarchy-4.1.0.iso.sha256"
-    pages = {OMARCHY: OMARCHY_PAGE.replace("omarchy-3.2.0.iso", "omarchy-4.1.0.iso"), sum_url: ""}
+    sum_url = "https://iso.omarchy.org/omarchy-4.1.0-x86.iso.sha256"
+    pages = {OMARCHY: OMARCHY_PAGE.replace("omarchy-3.2.0-x86.iso", "omarchy-4.1.0-x86.iso"), sum_url: ""}
     assert _fetch(monkeypatch, OmarchyRecipe, pages, "standard").version == "4.1.0"
 
 

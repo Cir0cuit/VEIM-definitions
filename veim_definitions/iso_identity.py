@@ -170,7 +170,7 @@ _RULES: List[_Rule] = [
           lambda m: ("musl-" if m.group("m") else "") + m.group("f").lower()),
     _Rule("gentoo", rf"install-amd64-minimal-{DATE8}T\d{{6}}Z\.iso", "minimal"),
     _Rule("gentoo", rf"livegui-amd64-{DATE8}T\d{{6}}Z\.iso", "livegui"),
-    _Rule("omarchy", rf"omarchy-{V}\.iso", "standard"),
+    _Rule("omarchy", rf"omarchy-{V}(?:-x86)?\.iso", "standard"),
 
     # VEIM's own name for it: upstream's is the same for every build.
     _Rule("bazzite", rf"(?P<f>bazzite(?:-deck)?(?:-gnome)?(?:-nvidia(?:-open)?)?)-stable-live-{DATE8}-amd64\.iso",

@@ -105,6 +105,7 @@ OFFICIAL = [
     ("garuda-dr460nized-gaming-linux-garuda-260819.iso", "garuda", "dr460nized-gaming", "260819"),
     ("garuda-xfce-linux-lts-260819.iso", "garuda", "xfce", "260819"),
     ("cachyos-handheld-linux-260628.iso", "cachyos", "handheld", "260628"),
+    ("omarchy-4.5.0-x86.iso", "omarchy", "standard", "4.5.0"),
     ("Nobara-44-Steam-HTPC-2026-09-02.iso", "nobara", "steam-htpc", "44 (2026-09-02)"),
     ("PikaOS-Nest-NVIDIA-KDE-4.0-amd64-v3-26.08.20-4.iso", "pikaos", "nvidia-kde", "4.0 (26.08.20)"),
     ("kali-linux-2026.2-installer-amd64.iso", "kali", "installer", "2026.2"),

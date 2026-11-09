@@ -130,7 +130,9 @@ class OmarchyRecipe(DistroRecipe):
             log.warning(f"[Omarchy] Scrape error: {e}")
             raise ScrapeError(self.name, f"could not read omarchy.org ({e})")
 
-        found = re.findall(r'(https://[^\s"\'<>]*/omarchy-(\d+(?:\.\d+)*)\.iso)', page.text)
+        # omarchy-4.5.0-x86.iso since 4.5; omarchy-4.0.4.iso before. The aarch64
+        # build is not offered.
+        found = re.findall(r'(https://[^\s"\'<>]*/omarchy-(\d+(?:\.\d+)*)(?:-x86)?\.iso)', page.text)
         if not found:
             raise ScrapeError(self.name, "no current release listed on omarchy.org")
         url, ver = max(found, key=lambda pair: version_key(pair[1]))
